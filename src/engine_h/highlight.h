@@ -5,76 +5,78 @@
 #include "src/engine_h/player.h"
 #include <stdbool.h>
 
-/*
+/* ================================================================
     TIMELINE EVENT
-*/
+   ================================================================ */
 
-#define MAX_EVENTS 128
+#define MAX_EVENTS 768
 
-typedef enum {
+typedef enum
+{
     EVT_NONE = 0,
-    EVT_BALL_STRAIGHT,      // Ball moves straight (easing)
-    EVT_BALL_BEZIER,        // Ball moves on bezier arc
-    EVT_BALL_HEADER,        // Ball header arc           
-    EVT_MOVE_PLAYERS,       // Move all/subset of players
-    EVT_SET_PLAYER_TARGET,  // Move single player
-    EVT_SHOW_TEXT,          // Show overlay text                    
-    EVT_HIDE_TEXT,          // Hide overlay text          
-    EVT_RESET_FORMATION,    // Teleport all players to pos          
-    EVT_BALL_TELEPORT,      // Teleport ball                  
-    EVT_WAIT,               // Just wait N seconds               
-    EVT_GOAL_FLASH,         // Goal celebration flash        
-    EVT_DRIBBLE,            // Player dribbles ball together        
-    EVT_SCORE_UPDATE,       // Update scoreboard
+
+    /*
+        Event baru (Sprint 6) — dipakai oleh fungsi HL_* di bawah.
+        Setiap gol menginisialisasi pemain dari awal menggunakan
+        EVT_SPAWN_PLAYER, lalu menggerakkannya dengan EVT_MOVE_PLAYER.
+    */
+    EVT_SPAWN_PLAYER,   /* Teleport + set identitas + beri tujuan  */
+    EVT_MOVE_PLAYER,    /* Ubah tujuan pemain yg sudah ada         */
+    EVT_SUB_PLAYER,     /* Ganti nama & nomor (substitusi)         */
+    EVT_BALL_MOVE,      /* Gerakkan bola (semua tipe termasuk Bezier)*/
+    EVT_BALL_TELEPORT,  /* Teleport bola tanpa animasi             */
+
+    EVT_SHOW_TEXT,
+    EVT_HIDE_TEXT,
+    EVT_GOAL_FLASH,
+    EVT_SCORE_UPDATE,
+    EVT_WAIT,
 } EventType;
 
-
-typedef struct {
+typedef struct
+{
     EventType type;
-    float     triggerTime;   /* seconds from highlight start */
+    float     triggerTime;
 
-    /* Ball moves */
-    float bx, by;
-    float cx, cy;
-    float duration;
+    /* EVT_SPAWN_PLAYER, EVT_MOVE_PLAYER, EVT_SUB_PLAYER */
+    int       playerIdx;
+    PlayerDef playerDef;    /* dipakai oleh SPAWN dan SUB */
 
-    /* Player moves */
-    int   playerIdx;         /* -1 = all players */
-    float px, py;
-    float speed;
+    /* EVT_BALL_MOVE, EVT_BALL_TELEPORT */
+    BallDef   ballDef;
 
-    /* Text */
-    char  text[128];
-    int   fontSize;
-    Color textColor;
+    /* EVT_SHOW_TEXT */
+    char      text[128];
+    int       fontSize;
+    Color     textColor;
 
-    /* Formation reset */
-    float formX[MAX_PLAYERS];
-    float formY[MAX_PLAYERS];
-    int   formCount;
-
-    /* Score update */
-    int   score1, score2;
-    int   minute;
+    /* EVT_SCORE_UPDATE */
+    int       score1, score2, minute;
 } TimelineEvent;
 
-/* 
-    HIGHLIGHT STATE
-*/
+
+
+/* ================================================================
+    OVERLAY TEXT
+   ================================================================ */
 
 #define MAX_OVERLAY_TEXTS 4
 
-
-typedef struct {
+typedef struct
+{
     char  text[128];
     int   x, y;
     int   fontSize;
     Color color;
-    float alpha;
     bool  visible;
 } OverlayText;
 
-typedef struct {
+/* ================================================================
+    HIGHLIGHT STATE
+   ================================================================ */
+
+typedef struct
+{
     char  title[64];
     char  subtitle[128];
 
@@ -87,13 +89,18 @@ typedef struct {
     int           eventCount;
     int           nextEvent;
 
-    float  elapsed;
-    bool   running;
-    bool   finished;
+    float elapsed;
+    bool  running;
+    bool  finished;
 
-    bool   goalFlash;
-    float  goalFlashTimer;
-    Color  goalFlashColor;
+    /*
+        Screen shake saat gol (menggantikan overlay warna).
+        shakeTimer > 0 berarti layar sedang bergetar.
+    */
+    float shakeTimer;
+    float shakeIntensity;
+    int   shakeOffsetX;
+    int   shakeOffsetY;
 
     OverlayText overlays[MAX_OVERLAY_TEXTS];
 
@@ -105,49 +112,97 @@ typedef struct {
     Color team2Color;
 } Highlight;
 
-/*
-    API
-*/
-void Highlight_Init(Highlight *h, const char *title, const char *sub,
-                    const char *t1, const char *t2,
-                    Color c1, Color c2);
-void Highlight_AddPlayer(Highlight *h, float x, float y, int num,
-                         Color col, Color numCol);
-void Highlight_AddEvent(Highlight *h, TimelineEvent ev);
+/* ================================================================
+    INIT
+   ================================================================ */
 
-// Event Builders
-TimelineEvent Evt_BallStraight(float t, float ex, float ey, float dur);
-TimelineEvent Evt_BallBezier(float t, float ex, float ey,
-                              float cx, float cy, float dur);
-TimelineEvent Evt_BallHeader(float t, float ex, float ey, float dur);
-TimelineEvent Evt_BallTeleport(float t, float bx, float by);
-TimelineEvent Evt_MoveAllPlayers(float t, float formX[], float formY[],
-                                  int count, float speed);
-TimelineEvent Evt_MoveSinglePlayer(float t, int idx,
-                                   float px, float py, float speed);
-TimelineEvent Evt_ShowText(float t, const char *text, int fontSize, Color col);
-TimelineEvent Evt_HideText(float t);
-TimelineEvent Evt_ResetFormation(float t, float formX[], float formY[], int count);
-TimelineEvent Evt_GoalFlash(float t, Color flashCol);
-TimelineEvent Evt_Wait(float t);
+void Highlight_Init(
+    Highlight *h,
+    const char *title, const char *sub,
+    const char *t1, const char *t2,
+    Color c1, Color c2
+);
+
+/* ================================================================
+    HL_ API (scene-facing)
+    Semua fungsi ini dipanggil dari kode scene untuk membangun
+    timeline. Nama pendek agar scene lebih mudah dibaca.
+
+    t     = waktu trigger dalam detik dari awal highlight
+    idx   = indeks pemain (0-21: Arsenal 0-10, MU 11-21)
+   ================================================================ */
 
 /*
-    Event_Dribble - pemain dan bola bergerak bersama ke (ex, ey)
-    Bola selalu offset +25px di depan pemain (arah gerakan)
-    playerIdx: index pemain yang dribble
-    ex, ey   : tujuan akhir pemain (bola ikut)
-    dur      : durasi dribble
+    HL_Spawn
+    Inisialisasi satu pemain di waktu t:
+    - teleport ke posisi (x,y) dari PlayerDef
+    - langsung mulai gerak ke (ex,ey) dengan dur dan moveType
+    Dipakai di awal setiap blok gol untuk set posisi awal semua pemain.
 */
-TimelineEvent Evt_Dribble(float t, int playerIdx,
-                           float ex, float ey, float dur);
+void HL_Spawn(Highlight *h, float t, int idx, PlayerDef def);
 
-/* 
-    Evt_ScoreUpdate
+/*
+    HL_Move
+    Ubah tujuan pemain yang sudah ada di lapangan.
+    x,y dari def DIABAIKAN — pemain bergerak dari posisi saat ini.
+    Biasanya pakai P_CONT agar posisi berantai.
 */
-TimelineEvent Evt_ScoreUpdate(float t, int s1, int s2, int minute);
+void HL_Move(Highlight *h, float t, int idx, PlayerDef def);
+
+/*
+    HL_Sub
+    Substitusi: ganti nama dan nomor pemain idx.
+    Posisi tidak berubah. Warna jersey tetap.
+    Gunakan P_SUB(prev_def, "NamaBaru", nomorBaru) untuk membuat def-nya.
+*/
+void HL_Sub(Highlight *h, float t, int idx, PlayerDef def);
+
+/*
+    HL_Ball
+    Gerakkan bola sesuai BallDef (lurus atau Bezier).
+    Posisi awal bola diambil dari BallDef.x/y.
+*/
+void HL_Ball(Highlight *h, float t, BallDef def);
+
+/*
+    HL_BallAt
+    Teleport bola ke koordinat tertentu tanpa animasi.
+    Dipakai untuk set posisi awal bola di awal setiap blok gol.
+*/
+void HL_BallAt(Highlight *h, float t, float x, float y);
+
+/*
+    HL_Text
+    Tampilkan teks overlay.
+*/
+void HL_Text(Highlight *h, float t, const char *text, int size, Color col);
+
+/*
+    HL_Hide
+    Sembunyikan semua teks overlay.
+*/
+void HL_Hide(Highlight *h, float t);
+
+/*
+    HL_Goal
+    Shorthand untuk GoalFlash + ScoreUpdate dalam satu panggilan.
+*/
+void HL_Goal(Highlight *h, float t, int s1, int s2, int minute);
+
+/*
+    HL_Wait
+    Tunggu sampai waktu t (tidak ada aksi, hanya menandai akhir scene).
+*/
+void HL_Wait(Highlight *h, float t);
+
+/* ================================================================
+    ENGINE (dipanggil oleh main.c dan menu.c, bukan scene)
+   ================================================================ */
 
 void Highlight_Update(Highlight *h, float dt);
 void Highlight_Draw(const Highlight *h);
 void Highlight_DrawHUD(const Highlight *h);
+
+TimelineEvent Evt_ScoreUpdate(float t, int s1, int s2, int minute);
 
 #endif

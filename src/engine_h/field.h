@@ -14,14 +14,14 @@
 #define GOAL_H 140
 
 // Stadium Color
-Color c_seat_red = {175, 22, 28, 255};
-Color c_seat_dark = {130, 14, 18, 255};
-Color c_seat_wht  = {210, 206, 198, 255};
-Color c_concrete  = { 75, 68, 62, 255};
-Color c_board_bg  = { 10, 10, 60, 255};
-Color c_board_txt = {160,160,255,255};
-Color c_floodlit  = {255,245,185,255};
-Color c_sky       = { 32, 38, 50, 255};
+#define c_seat_red  (Color){ 175, 22, 28, 255 }
+#define c_seat_dark (Color){ 130, 14, 18, 255 }
+#define c_seat_wht  (Color){ 210, 206, 198, 255 }
+#define c_concrete  (Color){ 75, 68, 62, 255 }
+#define c_board_bg  (Color){ 10, 10, 60, 255 }
+#define c_board_txt (Color){ 160, 160, 255, 255 }
+#define c_floodlit  (Color){ 255, 245, 185, 255 }
+#define c_sky       (Color){ 32, 38, 50, 255 }
 
 // Function atau API 
 void Field_Draw(void);

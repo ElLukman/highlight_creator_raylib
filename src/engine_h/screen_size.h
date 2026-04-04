@@ -1,5 +1,5 @@
-#ifndef SCREEN_H
-#define SCREEN_H
+#ifndef SCREEN_SIZE_H
+#define SCREEN_SIZE_H
 
 // Ukuran layar
 #define SCREEN_W 1920

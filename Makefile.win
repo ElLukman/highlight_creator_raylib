@@ -1,0 +1,54 @@
+# =============================================================================
+# Makefile.win — Football Highlight Creator  (Sprint 4)
+# Build: make -f Makefile.win run   (atau: make -f Makefile.win)
+# =============================================================================
+
+CC           = gcc
+TARGET       = FootballHighlight.exe
+RAYLIB_PATH ?= C:/raylib/raylib
+RAYLIB_INC   = $(RAYLIB_PATH)/src
+RAYLIB_LIB   = $(RAYLIB_PATH)/src
+
+SRCS = main.c \
+       src/algorithm_c/bresenham.c \
+       src/algorithm_c/midcircle.c \
+       src/engine_c/field.c \
+       src/engine_c/player.c \
+       src/engine_c/highlight.c \
+       src/engine_c/menu.c \
+       src/engine_c/audio.c \
+       src/scene/scene_arsenal_vs_mu.c \
+
+OBJS = $(SRCS:.c=.o)
+
+CFLAGS  = -std=c99 -Wall -Wextra -O2 -I. -I$(RAYLIB_INC)
+LDFLAGS = -L$(RAYLIB_LIB) -lraylib -lopengl32 -lgdi32 -lwinmm \
+          -mwindows -static-libgcc
+
+.PHONY: all run clean assets
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) -o $@ $(LDFLAGS)
+	@echo "==> Build OK: $(TARGET)"
+	@if not exist assets mkdir assets
+	@echo "==> Letakkan file audio di folder assets/"
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+run: all
+	./$(TARGET)
+
+# Buat folder assets jika belum ada
+assets:
+	if not exist assets mkdir assets
+	@echo "Folder assets/ dibuat. Letakkan file berikut di dalamnya:"
+	@echo "  assets/menu_music.ogg   -- musik main menu (loop)"
+	@echo "  assets/crowd_ambi.ogg   -- ambien penonton (loop saat replay)"
+
+clean:
+	del /Q $(TARGET) 2>nul || true
+	del /S /Q *.o    2>nul || true
+	@echo "Cleaned."

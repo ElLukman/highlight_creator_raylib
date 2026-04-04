@@ -1,4 +1,4 @@
-#include "midcircle.h"
+#include "src/algorithm_h/midcircle.h"
 
 static void PlotSymmetryPoints(int cx, int cy, int x, int y, Color color) {
     DrawPixel(cx + x, cy + y, color); 

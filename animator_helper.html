@@ -1,0 +1,333 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+canvas{display:block;border-radius:8px;border:0.5px solid var(--color-border-secondary);cursor:crosshair;touch-action:none;width:100%;}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:8px 0 4px;}
+button{font-size:12px;padding:4px 10px;border-radius:6px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;}
+button:hover{background:var(--color-background-secondary);}
+.bred{background:#dc1e1e;color:#fff;border-color:#dc1e1e;}
+.bred:hover{background:#b51818;}
+.badge{font-size:12px;font-weight:500;padding:4px 10px;border-radius:6px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);}
+.hint{font-size:11px;color:var(--color-text-tertiary);margin:2px 0 6px;}
+.toggle-row{display:flex;gap:16px;flex-wrap:wrap;margin:4px 0 6px;}
+.tog{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--color-text-secondary);cursor:pointer;padding:4px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);}
+.tog.active{border-color:#FFD700;color:#b8860b;}
+.tog.active-mu{border-color:#aaaaff;color:#6666cc;}
+.out{font-family:var(--font-mono);font-size:11px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:8px 12px;margin-top:6px;white-space:pre;overflow-x:auto;max-height:280px;overflow-y:auto;color:var(--color-text-primary);}
+</style>
+
+<canvas id="c" width="720" height="400"></canvas>
+
+<div class="bar">
+  <span class="badge" id="aksi-badge">Aksi 1</span>
+  <button class="bred" onclick="printAksi()">Print Aksi</button>
+  <button onclick="nextAksi()">Aksi Berikutnya +</button>
+  <button onclick="clearPrints()">Hapus Output</button>
+  <label style="font-size:12px;color:var(--color-text-secondary);display:flex;align-items:center;gap:4px;">
+    <input type="checkbox" id="showC" checked onchange="draw()"> Koordinat
+  </label>
+  <label style="font-size:12px;color:var(--color-text-secondary);display:flex;align-items:center;gap:4px;">
+    <input type="checkbox" id="half2" onchange="draw()"> Babak 2
+  </label>
+</div>
+
+<p class="hint">Klik kanan pemain untuk info. Ring kuning = pemain masuk (substitusi).</p>
+
+<div class="toggle-row" id="sub-toggles"></div>
+
+<div class="out" id="out">// Klik "Print Aksi" untuk generate output...</div>
+
+<script>
+const CV=document.getElementById('c');
+const ctx=CV.getContext('2d');
+const FX=50,FY=15,FW=620,FH=365;
+const GFX=120,GFY=80,GFW=1680,GFH=920;
+const R=12;
+
+// Semua pemain — versi asli
+const BASE=[
+  {id:0,  name:'Raya',      num:1,  team:'ARS', gx:204, gy:540},
+  {id:1,  name:'Hincapie',  num:5,  team:'ARS', gx:422, gy:246},
+  {id:2,  name:'Gabriel',   num:6,  team:'ARS', gx:422, gy:411},
+  {id:3,  name:'Saliba',    num:2,  team:'ARS', gx:422, gy:650},
+  {id:4,  name:'Timber',    num:12, team:'ARS', gx:422, gy:816},
+  {id:5,  name:'Zubimendi', num:36, team:'ARS', gx:691, gy:540},
+  {id:6,  name:'Rice',      num:41, team:'ARS', gx:792, gy:338},
+  {id:7,  name:'Odegaard',  num:8,  team:'ARS', gx:826, gy:706},
+  {id:8,  name:'Trossard',  num:19, team:'ARS', gx:1027,gy:264},
+  {id:9,  name:'Jesus',     num:19, team:'ARS', gx:960, gy:540},
+  {id:10, name:'Saka',      num:7,  team:'ARS', gx:1027,gy:798},
+  {id:11, name:'Lammens',   num:1,  team:'MU',  gx:1716,gy:540},
+  {id:12, name:'Dalot',     num:2,  team:'MU',  gx:1464,gy:246},
+  {id:13, name:'Maguire',   num:5,  team:'MU',  gx:1498,gy:411},
+  {id:14, name:'Martinez',  num:6,  team:'MU',  gx:1498,gy:650},
+  {id:15, name:'Shaw',      num:23, team:'MU',  gx:1464,gy:816},
+  {id:16, name:'Casemiro',  num:18, team:'MU',  gx:1296,gy:338},
+  {id:17, name:'Mainoo',    num:37, team:'MU',  gx:1296,gy:706},
+  {id:18, name:'Fernandes', num:8,  team:'MU',  gx:1162,gy:540},
+  {id:19, name:'Amad',      num:16, team:'MU',  gx:1262,gy:246},
+  {id:20, name:'Mbeumo',    num:19, team:'MU',  gx:1094,gy:540},
+  {id:21, name:'Dorgu',     num:13, team:'MU',  gx:1262,gy:816},
+];
+
+// Daftar substitusi: {idx, outName, inName, inNum}
+const SUBS=[
+  {idx:1,  out:'Hincapie',  inName:'B.White',   inNum:4,  team:'ARS'},
+  {idx:5,  out:'Zubimendi', inName:'Eze',        inNum:10, team:'ARS'},
+  {idx:7,  out:'Odegaard',  inName:'Merino',     inNum:23, team:'ARS'},
+  {idx:9,  out:'Jesus',     inName:'Gyokeres',   inNum:11, team:'ARS'},
+  {idx:8,  out:'Trossard',  inName:'Madueke',    inNum:20, team:'ARS'},
+  {idx:20, out:'Mbeumo',    inName:'Cunha',      inNum:10, team:'MU'},
+  {idx:21, out:'Dorgu',     inName:'Sesko',      inNum:30, team:'MU'},
+  {idx:19, out:'Amad',      inName:'Mazraoui',   inNum:3,  team:'MU'},
+];
+
+// State aktif substitusi
+let subActive={};
+SUBS.forEach(s=>{ subActive[s.idx]=false; });
+
+let players=JSON.parse(JSON.stringify(BASE));
+let ball={gx:960,gy:540};
+let prevPlayers=null,prevBall=null;
+let dragging=null,dragType=null,dragOx=0,dragOy=0;
+let aksiNum=1,prints=[];
+
+function applySubsToPlayers(){
+  players.forEach(p=>{
+    const base=BASE.find(b=>b.id===p.id);
+    const sub=SUBS.find(s=>s.idx===p.id);
+    if(sub&&subActive[p.id]){
+      p.name=sub.inName;
+      p.num=sub.inNum;
+    } else if(base){
+      p.name=base.name;
+      p.num=base.num;
+    }
+  });
+}
+
+function buildToggles(){
+  const div=document.getElementById('sub-toggles');
+  div.innerHTML='';
+  SUBS.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='tog'+(s.team==='MU'?' active-mu':'');
+    btn.id='tog_'+s.idx;
+    btn.innerHTML=`${s.team==='ARS'?'🔴':'⚫'} ${s.out} → <b>${s.inName}</b> #${s.inNum}`;
+    btn.onclick=()=>{
+      subActive[s.idx]=!subActive[s.idx];
+      btn.style.background=subActive[s.idx]?(s.team==='ARS'?'rgba(220,30,30,0.12)':'rgba(100,100,255,0.12)'):'';
+      btn.style.borderColor=subActive[s.idx]?(s.team==='ARS'?'#dc1e1e':'#8888ff'):'';
+      btn.style.color=subActive[s.idx]?(s.team==='ARS'?'#dc1e1e':'#6666cc'):'';
+      applySubsToPlayers();
+      draw();
+    };
+    div.appendChild(btn);
+  });
+}
+
+function gc(cx,cy){return{x:Math.round(GFX+(cx-FX)/FW*GFW),y:Math.round(GFY+(cy-FY)/FH*GFH)};}
+function cc(gx,gy){return{x:FX+(gx-GFX)/GFW*FW,y:FY+(gy-GFY)/GFH*FH};}
+
+function clamp(gx,gy){
+  return{gx:Math.max(GFX-20,Math.min(GFX+GFW+20,gx)),gy:Math.max(GFY,Math.min(GFY+GFH,gy))};
+}
+
+function hitTest(mx,my){
+  const bc=cc(ball.gx,ball.gy);
+  if(Math.hypot(mx-bc.x,my-bc.y)<11)return{type:'ball',id:'ball'};
+  for(let i=players.length-1;i>=0;i--){
+    const c=cc(players[i].gx,players[i].gy);
+    if(Math.hypot(mx-c.x,my-c.y)<R+2)return{type:'player',id:players[i].id};
+  }
+  return null;
+}
+
+function getXY(e){
+  const r=CV.getBoundingClientRect(),sx=CV.width/r.width,sy=CV.height/r.height;
+  if(e.touches)return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+  return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+}
+
+CV.addEventListener('mousedown',e=>{
+  if(e.button===2)return;
+  const{x,y}=getXY(e);
+  const h=hitTest(x,y);if(!h)return;
+  dragging=h.id;dragType=h.type;
+  if(dragType==='ball'){const c=cc(ball.gx,ball.gy);dragOx=x-c.x;dragOy=y-c.y;}
+  else{const p=players.find(p=>p.id===h.id);const c=cc(p.gx,p.gy);dragOx=x-c.x;dragOy=y-c.y;}
+});
+CV.addEventListener('mousemove',e=>{
+  if(dragging===null)return;
+  const{x,y}=getXY(e);
+  const g=gc(x-dragOx,y-dragOy);
+  const cl=clamp(g.x,g.y);
+  if(dragType==='ball'){ball.gx=cl.gx;ball.gy=cl.gy;}
+  else{const p=players.find(p=>p.id===dragging);p.gx=cl.gx;p.gy=cl.gy;}
+  draw();
+});
+CV.addEventListener('mouseup',()=>{dragging=null;draw();});
+CV.addEventListener('mouseleave',()=>{dragging=null;});
+CV.addEventListener('contextmenu',e=>{
+  e.preventDefault();
+  const{x,y}=getXY(e);
+  const h=hitTest(x,y);
+  if(h&&h.type==='player'){
+    const p=players.find(p=>p.id===h.id);
+    const isSub=SUBS.find(s=>s.idx===p.id)&&subActive[p.id];
+    alert(`[${p.id}] #${p.num} ${p.name}\n${p.team}${isSub?' (PEMAIN MASUK)':''}\nx=${p.gx} y=${p.gy}`);
+  }
+});
+CV.addEventListener('touchstart',e=>{e.preventDefault();CV.dispatchEvent(new MouseEvent('mousedown',{clientX:e.touches[0].clientX,clientY:e.touches[0].clientY}));},{passive:false});
+CV.addEventListener('touchmove',e=>{e.preventDefault();CV.dispatchEvent(new MouseEvent('mousemove',{clientX:e.touches[0].clientX,clientY:e.touches[0].clientY}));},{passive:false});
+CV.addEventListener('touchend',e=>{e.preventDefault();CV.dispatchEvent(new MouseEvent('mouseup'));},{passive:false});
+
+function drawField(){
+  ctx.clearRect(0,0,720,400);
+  ctx.fillStyle='#1e7a1e';ctx.fillRect(FX,FY,FW,FH);
+  for(let i=0;i<14;i++){
+    ctx.fillStyle=i%2===0?'#1a6e1a':'#228a22';
+    ctx.fillRect(FX+Math.floor(FW*i/14),FY,Math.ceil(FW/14),FH);
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.8)';ctx.lineWidth=1.2;
+  ctx.strokeRect(FX,FY,FW,FH);
+  ctx.beginPath();ctx.moveTo(FX+FW/2,FY);ctx.lineTo(FX+FW/2,FY+FH);ctx.stroke();
+  ctx.beginPath();ctx.arc(FX+FW/2,FY+FH/2,FH*0.13,0,Math.PI*2);ctx.stroke();
+  const pbW=FW*0.14,pbH=FH*0.44,pbY=FY+FH/2-pbH/2;
+  ctx.strokeRect(FX,pbY,pbW,pbH);ctx.strokeRect(FX+FW-pbW,pbY,pbW,pbH);
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  ctx.fillRect(FX-10,FY+FH/2-FH*0.11,10,FH*0.22);
+  ctx.fillRect(FX+FW,FY+FH/2-FH*0.11,10,FH*0.22);
+  ctx.strokeStyle='rgba(255,255,255,0.6)';ctx.lineWidth=1.5;
+  ctx.strokeRect(FX-10,FY+FH/2-FH*0.11,10,FH*0.22);
+  ctx.strokeRect(FX+FW,FY+FH/2-FH*0.11,10,FH*0.22);
+  const h2=document.getElementById('half2').checked;
+  ctx.fillStyle='rgba(255,220,80,0.85)';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+  ctx.fillText(h2?'<- Arsenal':'Arsenal ->',FX+FW*0.22,FY+FH+14);
+  ctx.fillText(h2?'MU ->':'<- MU',FX+FW*0.78,FY+FH+14);
+  ctx.fillStyle='rgba(255,255,0,0.55)';ctx.font='9px sans-serif';
+  ctx.fillText('GL(111)',FX-5,FY+FH/2-FH*0.11-4);
+  ctx.fillText('GR(1809)',FX+FW+5,FY+FH/2-FH*0.11-4);
+}
+
+function drawPlayers(){
+  const showC=document.getElementById('showC').checked;
+  players.forEach(p=>{
+    const c=cc(p.gx,p.gy);
+    const isA=p.team==='ARS';
+    const isSub=SUBS.find(s=>s.idx===p.id)&&subActive[p.id];
+
+    // Shadow
+    ctx.beginPath();ctx.arc(c.x+2,c.y+2,R,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,0,0,0.22)';ctx.fill();
+    // Body
+    ctx.beginPath();ctx.arc(c.x,c.y,R,0,Math.PI*2);
+    ctx.fillStyle=isA?'#dc1e1e':'#1a1a1a';ctx.fill();
+    // Ring kuning = pemain masuk
+    if(isSub){
+      ctx.beginPath();ctx.arc(c.x,c.y,R+3.5,0,Math.PI*2);
+      ctx.strokeStyle='#FFD700';ctx.lineWidth=2.2;ctx.stroke();
+    }
+    // Outline
+    ctx.strokeStyle=dragging===p.id&&dragType==='player'?'#00ff88':'rgba(255,255,255,0.9)';
+    ctx.lineWidth=1.3;
+    ctx.beginPath();ctx.arc(c.x,c.y,R,0,Math.PI*2);ctx.stroke();
+    // Nomor
+    ctx.fillStyle='#fff';ctx.font='bold 8px sans-serif';ctx.textAlign='center';
+    ctx.fillText(p.num,c.x,c.y+3);
+    // Nama
+    ctx.fillStyle=isA?'#ffbbbb':'#aaaaff';ctx.font='7px sans-serif';
+    const nameShow=p.name.length>9?p.name.slice(0,8)+'…':p.name;
+    ctx.fillText(nameShow,c.x,c.y-R-5);
+    // Koordinat
+    if(showC){
+      ctx.fillStyle='rgba(255,255,255,0.65)';ctx.font='7px sans-serif';
+      ctx.fillText(p.gx+','+p.gy,c.x,c.y+R+9);
+    }
+  });
+  // Bola
+  const bc=cc(ball.gx,ball.gy);
+  ctx.beginPath();ctx.arc(bc.x+1,bc.y+1,6,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fill();
+  ctx.beginPath();ctx.arc(bc.x,bc.y,6,0,Math.PI*2);
+  ctx.fillStyle='#F5A623';ctx.fill();
+  ctx.strokeStyle=dragging==='ball'?'#00ff88':'#333';ctx.lineWidth=1;ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='bold 7px sans-serif';ctx.textAlign='center';
+  ctx.fillText('B',bc.x,bc.y+2.5);
+  if(document.getElementById('showC').checked){
+    ctx.fillStyle='rgba(255,200,0,0.9)';ctx.font='bold 7px sans-serif';
+    ctx.fillText(ball.gx+','+ball.gy,bc.x,bc.y-10);
+  }
+}
+
+function draw(){drawField();drawPlayers();}
+
+function printAksi(){
+  const h2=document.getElementById('half2').checked;
+  const label=h2?'Babak 2':'Babak 1';
+  const lines=[];
+
+  lines.push(`/* ${'='.repeat(64)}`);
+  lines.push(`   AKSI ${aksiNum} | ${label}`);
+  lines.push(`   ${'='.repeat(64)} */`);
+  lines.push('');
+
+  // Catat substitusi yang aktif
+  const activeSubs=SUBS.filter(s=>subActive[s.idx]);
+  if(activeSubs.length>0){
+    lines.push('/* Substitusi aktif:');
+    activeSubs.forEach(s=>{
+      lines.push(`   [${s.idx}] ${s.out} -> ${s.inName} #${s.inNum}`);
+    });
+    lines.push('*/');
+    lines.push('');
+  }
+
+  if(prevPlayers&&aksiNum>1){
+    lines.push(`/* Perubahan posisi dari Aksi ${aksiNum-1} -> Aksi ${aksiNum}: */`);
+    players.forEach(p=>{
+      const pp=prevPlayers.find(q=>q.id===p.id);
+      if(pp&&(pp.gx!==p.gx||pp.gy!==p.gy)){
+        lines.push(`/* [${String(p.id).padStart(2)}] ${p.name.padEnd(10)} : (${pp.gx},${pp.gy}) -> (${p.gx},${p.gy}) */`);
+      }
+    });
+    if(prevBall&&(prevBall.gx!==ball.gx||prevBall.gy!==ball.gy)){
+      lines.push(`/* [bola]               : (${prevBall.gx},${prevBall.gy}) -> (${ball.gx},${ball.gy}) */`);
+    }
+    lines.push('');
+  }
+
+  lines.push(`/* Posisi lengkap Aksi ${aksiNum}: */`);
+  lines.push('// Arsenal');
+  players.filter(p=>p.team==='ARS').forEach(p=>{
+    lines.push(`// [${String(p.id).padStart(2)}] #${String(p.num).padStart(2)} ${p.name.padEnd(10)} x=${String(p.gx).padStart(4)} y=${String(p.gy).padStart(4)}`);
+  });
+  lines.push('// Man Utd');
+  players.filter(p=>p.team==='MU').forEach(p=>{
+    lines.push(`// [${String(p.id).padStart(2)}] #${String(p.num).padStart(2)} ${p.name.padEnd(10)} x=${String(p.gx).padStart(4)} y=${String(p.gy).padStart(4)}`);
+  });
+  lines.push(`// Bola                     x=${String(ball.gx).padStart(4)} y=${String(ball.gy).padStart(4)}`);
+  lines.push('');
+
+  prevPlayers=JSON.parse(JSON.stringify(players));
+  prevBall={...ball};
+
+  prints.push(lines.join('\n'));
+  document.getElementById('out').textContent=prints.join('\n');
+  document.getElementById('out').scrollTop=999999;
+}
+
+function nextAksi(){
+  aksiNum++;
+  document.getElementById('aksi-badge').textContent='Aksi '+aksiNum;
+}
+
+function clearPrints(){
+  prints=[];aksiNum=1;prevPlayers=null;prevBall=null;
+  document.getElementById('aksi-badge').textContent='Aksi 1';
+  document.getElementById('out').textContent='// Klik "Print Aksi" untuk generate output...';
+}
+
+buildToggles();
+draw();
+</script>

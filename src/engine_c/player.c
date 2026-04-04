@@ -7,20 +7,27 @@
 #include <stdio.h>
 
 /*
-    Easing Function (Opsi untuk animasi)
+    Easing Functions
+    Semua menerima t dalam [0,1] dan mengembalikan nilai [0,1].
 */
 
+static float Ease_Linear(float t)
+{
+    return t;
+}
 
-
-// Ease-out cubic: mulai cepat, lambat di akhir
-static float EaseOutCubic(float t)
+static float Ease_Out(float t)
 {
     float f = 1.0f - t;
     return 1.0f - f * f * f;
 }
 
-// Ease-in-out cubic: lambat-cepat-lambat (untuk lemparan/sundulan)
-static float EaseInOutCubic(float t)
+static float Ease_In(float t)
+{
+    return t * t * t;
+}
+
+static float Ease_InOut(float t)
 {
     if (t < 0.5f)
         return 4.0f * t * t * t;
@@ -28,39 +35,63 @@ static float EaseInOutCubic(float t)
     return 1.0f - f * f * f / 2.0f;
 }
 
-/*
-    Player Movement
-*/
-
-void Player_Init(
-    Player *p, float x, float y, int number,
-    Color col, Color numCol)
+static float ApplyEasing(float t, MoveType mt)
 {
-    p->x = x;
-    p->y = y;
-    p->tx = x;
-    p->ty = y;
-    p->speed = 2.0f;
-    p->number = number;
-    p->color = col;
-    p->numColor = numCol;
-    p->active = true;
+    switch (mt)
+    {
+    case LINEAR:      return Ease_Linear(t);
+    case EASE_OUT:    return Ease_Out(t);
+    case EASE_IN:     return Ease_In(t);
+    case EASE_IN_OUT: return Ease_InOut(t);
+    default:          return Ease_Out(t);
+    }
 }
 
-void Player_SetTarget(Player *p, float tx, float ty, float speed)
+/*
+    Player
+*/
+
+void Player_InitFromDef(Player *p, const PlayerDef *def)
 {
-    p->tx = tx;
-    p->ty = ty;
-    p->speed = speed;
+    p->x          = def->x;
+    p->y          = def->y;
+    p->tx         = def->ex;
+    p->ty         = def->ey;
+    p->speed      = 0.0f;
+    p->moveType   = def->moveType;
+    p->moveElapsed = 0.0f;
+    p->moveDur    = def->dur;
+    p->startX     = def->x;
+    p->startY     = def->y;
+    p->num        = def->num;
+    p->color      = def->color;
+    p->numColor   = def->numColor;
+    p->active     = true;
+    strncpy(p->name, def->name, 23);
+    p->name[23] = '\0';
+}
+
+void Player_SetTarget(Player *p, float tx, float ty,
+                      float dur, MoveType mt)
+{
+    p->startX     = p->x;
+    p->startY     = p->y;
+    p->tx         = tx;
+    p->ty         = ty;
+    p->moveDur    = dur;
+    p->moveType   = mt;
+    p->moveElapsed = 0.0f;
 }
 
 void Player_Update(Player *p, float dt)
 {
     if (!p->active)
         return;
+
     float dx = p->tx - p->x;
     float dy = p->ty - p->y;
     float dist = sqrtf(dx * dx + dy * dy);
+
     if (dist < 0.5f)
     {
         p->x = p->tx;
@@ -68,141 +99,121 @@ void Player_Update(Player *p, float dt)
         return;
     }
 
-    float max_step = p->speed * 60.0f * dt;
-    float ease_factor = dist / (dist + 40.0f);
-    float step = max_step * (0.4f + 0.6f * ease_factor);
-    if (step > dist)
-        step = dist;
+    if (p->moveDur <= 0.0f)
+    {
+        /* Tidak ada durasi: langsung teleport */
+        p->x = p->tx;
+        p->y = p->ty;
+        return;
+    }
 
-    p->x += (dx / dist) * step;
-    p->y += (dy / dist) * step;
+    p->moveElapsed += dt;
+    float rawT = p->moveElapsed / p->moveDur;
+    if (rawT >= 1.0f)
+    {
+        rawT = 1.0f;
+        p->x = p->tx;
+        p->y = p->ty;
+        return;
+    }
+
+    float et = ApplyEasing(rawT, p->moveType);
+    p->x = p->startX + (p->tx - p->startX) * et;
+    p->y = p->startY + (p->ty - p->startY) * et;
 }
 
 void Player_Draw(const Player *p)
 {
     if (!p->active)
         return;
+
     int cx = (int)p->x, cy = (int)p->y;
+    Vector2 cpos = { (float)cx, (float)cy };
 
-    // Shadow
-    MidcircleFilled(cx + 3, cy + 4, PLAYER_RADIUS, (Color){0, 0, 0, 55});
+    /* Shadow — satu GPU call */
+    DrawCircleV((Vector2){(float)(cx+2),(float)(cy+3)},
+                (float)PLAYER_RADIUS, (Color){0,0,0,60});
 
-    // Body
-    MidcircleFilled(cx, cy, PLAYER_RADIUS, p->color);
+    /* Body — satu GPU call */
+    DrawCircleV(cpos, (float)PLAYER_RADIUS, p->color);
 
-    // White outline
-    Midcircle(cx, cy, PLAYER_RADIUS, WHITE);
+    /* Outline putih — satu GPU call */
+    DrawCircleLines(cx, cy, (float)PLAYER_RADIUS, WHITE);
 
-    // Jersey number
+    /* Nomor punggung */
     char buf[4];
-    snprintf(buf, sizeof(buf), "%d", p->number);
+    snprintf(buf, sizeof(buf), "%d", p->num);
     int tw = MeasureText(buf, 10);
     DrawText(buf, cx - tw / 2, cy - 5, 10, p->numColor);
 }
 
-void Players_MoveAll(Player players[], int count,
-                     float baseX[], float baseY[], float speed)
-{
-    for (int i = 0; i < count; i++)
-        Player_SetTarget(&players[i], baseX[i], baseY[i], speed);
-}
-
 /*
-    Ball Movement
+    Ball
 */
 
-void Ball_Init(Ball *b, float x, float y)
+static float BezierPoint(float p0, float p1, float p2, float t)
 {
-    b->x = x;
-    b->y = y;
-    b->sx = x;
-    b->sy = y;
-    b->ex = x;
-    b->ey = y;
-    b->cx = x;
-    b->cy = y;
-    b->t = 0;
-    b->duration = 1.0f;
-    b->elapsed = 0;
-    b->moveType = BALL_STRAIGHT;
-    b->moving = false;
-    b->radius = 8;
-    b->inGoal = false;
+    float inv = 1.0f - t;
+    return inv * inv * p0 + 2.0f * inv * t * p1 + t * t * p2;
 }
 
-void Ball_MoveStraight(Ball *b, float ex, float ey, float duration)
+void Ball_InitFromDef(Ball *b, const BallDef *def)
 {
-    b->sx = b->x;
-    b->sy = b->y;
-    b->ex = ex;
-    b->ey = ey;
-    b->duration = duration;
-    b->elapsed = 0;
-    b->t = 0;
-    b->moveType = BALL_STRAIGHT;
-    b->moving = true;
-}
-
-void Ball_MoveBezier(Ball *b, float ex, float ey, float cx, float cy, float duration)
-{
-    b->sx = b->x;
-    b->sy = b->y;
-    b->ex = ex;
-    b->ey = ey;
-    b->cx = cx;
-    b->cy = cy;
-    b->duration = duration;
-    b->elapsed = 0;
-    b->t = 0;
-    b->moveType = BALL_BEZIER;
-    b->moving = true;
-}
-
-void Ball_MoveHeader(Ball *b, float ex, float ey, float duration)
-{
-    float mx = (b->x + ex) * 0.5f;
-    float my = (b->y + ey) * 0.5f - 90.0f;
-    Ball_MoveBezier(b, ex, ey, mx, my, duration);
+    b->x        = def->x;
+    b->y        = def->y;
+    b->sx       = def->x;
+    b->sy       = def->y;
+    b->ex       = def->ex;
+    b->ey       = def->ey;
+    b->cx       = def->cx;
+    b->cy       = def->cy;
+    b->duration = def->dur;
+    b->elapsed  = 0.0f;
+    b->t        = 0.0f;
+    b->moveType = def->moveType;
+    b->moving   = (def->dur > 0.0f);
+    b->radius   = 8;
+    b->inGoal   = false;
 }
 
 void Ball_Update(Ball *b, float dt)
 {
     if (!b->moving)
         return;
+
     b->elapsed += dt;
-    float raw_t = b->elapsed / b->duration;
-    if (raw_t >= 1.0f)
+    float rawT = b->elapsed / b->duration;
+    if (rawT >= 1.0f)
     {
-        raw_t = 1.0f;
+        rawT = 1.0f;
         b->moving = false;
     }
 
-    if (b->moveType == BALL_STRAIGHT)
+    b->t = rawT;
+
+    if (b->moveType == BEZIER)
     {
-        /*
-         * FIX animasi bola kaku:
-         * Dulu: raw_t langsung dipakai → constant velocity
-         * Sekarang: ease-out cubic → melambat saat mendekati tujuan
-         */
-        float et = EaseOutCubic(raw_t);
-        b->x = b->sx + (b->ex - b->sx) * et;
-        b->y = b->sy + (b->ey - b->sy) * et;
+        /* Quadratic Bezier dengan EASE_IN_OUT */
+        float et = Ease_InOut(rawT);
+        b->x = BezierPoint(b->sx, b->cx, b->ex, et);
+        b->y = BezierPoint(b->sy, b->cy, b->ey, et);
     }
     else
     {
-        // Quadratic Bezier: B(t) = (1-t)^2*P0 + 2(1-t)t*P1 + t^2*P2
-        float et = EaseInOutCubic(raw_t);
-        float inv = 1.0f - et;
-        b->x = inv * inv * b->sx + 2.0f * inv * et * b->cx + et * et * b->ex;
-        b->y = inv * inv * b->sy + 2.0f * inv * et * b->cy + et * et * b->ey;
+        float et = ApplyEasing(rawT, b->moveType);
+        b->x = b->sx + (b->ex - b->sx) * et;
+        b->y = b->sy + (b->ey - b->sy) * et;
     }
-    b->t = raw_t;
 }
 
 void Ball_Draw(const Ball *b)
 {
     int bx = (int)b->x, by = (int)b->y;
-    MidcircleFilled(bx, by, 6, (Color){255, 255, 255, 255});
-    Midcircle(bx, by, 6, (Color){0, 0, 0, 255});
-    DrawPixel(bx, by, (Color){0, 0, 0, 255});
+    Vector2 bpos = { (float)bx, (float)by };
+    /* Shadow */
+    DrawCircleV((Vector2){(float)(bx+1),(float)(by+1)}, 6.0f, (Color){0,0,0,60});
+    /* Body putih */
+    DrawCircleV(bpos, 6.0f, (Color){255,255,255,255});
+    /* Outline hitam */
+    DrawCircleLines(bx, by, 6.0f, (Color){0,0,0,200});
 }
