@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SHAKE_DURATION  0.5f
+#define SHAKE_DURATION  5.0f
 #define SHAKE_INTENSITY 7.0f
 
 /* ================================================================
@@ -49,7 +49,7 @@ void Highlight_Init(
     HL_ API — builder functions (scene-facing)
    ================================================================ */
 
-static void AddEvent(Highlight *h, TimelineEvent ev)
+void AddEvent(Highlight *h, TimelineEvent ev)
 {
     if (h->eventCount >= MAX_EVENTS)
         return;

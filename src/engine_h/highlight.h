@@ -203,6 +203,7 @@ void Highlight_Update(Highlight *h, float dt);
 void Highlight_Draw(const Highlight *h);
 void Highlight_DrawHUD(const Highlight *h);
 
-TimelineEvent Evt_ScoreUpdate(float t, int s1, int s2, int minute);
+void AddEvent(Highlight *h, TimelineEvent ev);
+
 
 #endif

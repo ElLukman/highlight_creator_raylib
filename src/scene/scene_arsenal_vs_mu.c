@@ -218,6 +218,8 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 0.5f;
 
     /* ===== GOL 1 - Aksi 7 ===== */
+    HL_Goal(&h, t, 1, 0, 29);
+    HL_Text(&h, t, "GOOOL!! 1-0  |  29'  OG Martinez", 28, GOLD);
 
     /* Aksi 8->9 selebrasi (5s) */
     HL_Move(&h, t,  0, P_CONT(g1[ 0],  317,  602, 5.0f, LINEAR));
@@ -243,6 +245,8 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 20, P_CONT(g1[20], 1575,  409, 5.0f, LINEAR));
     HL_Move(&h, t, 21, P_CONT(g1[21], 1770,  651, 5.0f, LINEAR));
     t += 5.0f;
+
+    HL_Hide(&h, t);
 
     /* ============================================================
        GOL 2 - 37' | Mbeumo | 1-1
@@ -398,6 +402,8 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 2.0f;
 
     /* ===== GOL 2 - di bawah Aksi 5->6 ===== */
+    HL_Goal(&h, t, 1, 1, 37);
+    HL_Text(&h, t, "GOOOL!! 1-1  |  37'  Mbeumo", 28, WHITE);
 
     /* Aksi 6->7 selebrasi MU (8s) */
     HL_Move(&h, t,  0, P_CONT(g2[ 0],  112,  529, 8.0f, LINEAR));
@@ -424,6 +430,7 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(103, 495, 130, 534, 8.0f, LINEAR));
     t += 8.0f;
 
+    HL_Hide(&h, t);
     /* ============================================================
        GOL 3 - 50' | Dorgu | 1-2  (BABAK 2 - sisi bertukar)
        Arsenal GK di kanan, MU GK di kiri
@@ -637,6 +644,8 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 1.0f;
 
     /* ===== GOL 3 - di bawah Aksi 8->9 ===== */
+    HL_Goal(&h, t, 1, 2, 50);
+    HL_Text(&h, t, "GOOOL!! 1-2  |  50'  Patrick Dorgu", 28, WHITE);
 
     /* Aksi 9->10 selebrasi MU (21s) */
     HL_Move(&h, t,  0, P_CONT(g3[ 0], 1719,  530, 21.0f, LINEAR));
@@ -665,6 +674,7 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 21.0f;
     t += 2.0f;  /* jeda pasca gol */
 
+    HL_Hide(&h, t);
     /* ============================================================
        GOL 4 - 84' | Merino | 2-2  (Substitusi aktif)
        ============================================================ */
@@ -833,6 +843,8 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 0.8f;
 
     /* ===== GOL 4 - di bawah Aksi 6->7 ===== */
+    HL_Goal(&h, t, 2, 2, 84);
+    HL_Text(&h, t, "GOOOL!! 2-2  |  84'  Mikel Merino", 28, GOLD);
 
     /* Aksi 7->8 (0.7s) */
     HL_Move(&h, t,  1, P_CONT(g4b[ 1],  166,  626, 0.7f, LINEAR));
@@ -884,6 +896,7 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(271, 530, 961, 539, 11.0f, LINEAR));
     t += 11.0f;
 
+    HL_Hide(&h, t);
     /* ============================================================
        GOL 5 - 87' | Cunha | 2-3
        ============================================================ */
@@ -1064,6 +1077,8 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 0.8f;
 
     /* ===== GOL 5 - di bawah Aksi 6->7 ===== */
+    HL_Goal(&h, t, 2, 3, 87);
+    HL_Text(&h, t, "GOOOOL!!  CUNHA 2-3!!  MAN UTD MENANG!! 87'", 30, WHITE);
 
     /* Aksi 7->8 selebrasi MU (8s) */
     HL_Move(&h, t,  0, P_CONT(g5[ 0], 1819,  549, 8.0f, LINEAR));
