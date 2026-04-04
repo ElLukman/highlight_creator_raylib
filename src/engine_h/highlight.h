@@ -9,7 +9,7 @@
     TIMELINE EVENT
    ================================================================ */
 
-#define MAX_EVENTS 768
+#define MAX_EVENTS 2000
 
 typedef enum
 {
