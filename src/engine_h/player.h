@@ -45,8 +45,8 @@ API
 
 // Player helpers
 void Player_Init(
-    Player *p, float x, float y, Color col,
-    Color numCol
+    Player *p, float x, float y, int number, 
+    Color col, Color numCol
 );
 void Player_SetTarget(Player *p, float tx, float ty, float speed);
 void Player_Update(Player *p, float dt);
