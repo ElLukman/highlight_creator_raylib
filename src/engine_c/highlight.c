@@ -155,6 +155,15 @@ void HL_Goal(Highlight *h, float t, int s1, int s2, int minute)
     es.score2 = s2;
     es.minute = minute;
     AddEvent(h, es);
+
+    /* Log gol ke history */
+    TimelineEvent el;
+    memset(&el, 0, sizeof(el));
+    el.type = EVT_LOG_EVENT;
+    el.triggerTime = t;
+    snprintf(el.text, 127, "GOAL  %d-%d  |  %d'", s1, s2, minute);
+    el.textColor = (Color){255, 210, 0, 255};
+    AddEvent(h, el);
 }
 
 void HL_Wait(Highlight *h, float t)
@@ -163,6 +172,17 @@ void HL_Wait(Highlight *h, float t)
     memset(&ev, 0, sizeof(ev));
     ev.type = EVT_WAIT;
     ev.triggerTime = t;
+    AddEvent(h, ev);
+}
+
+void HL_Log(Highlight *h, float t, const char *text, Color col)
+{
+    TimelineEvent ev;
+    memset(&ev, 0, sizeof(ev));
+    ev.type = EVT_LOG_EVENT;
+    ev.triggerTime = t;
+    strncpy(ev.text, text, 127);
+    ev.textColor = col;
     AddEvent(h, ev);
 }
 
@@ -268,6 +288,16 @@ void Highlight_Update(Highlight *h, float dt)
         case EVT_WAIT:
             /* Tandai selesai ketika event wait diproses */
             h->finished = true;
+            break;
+
+        case EVT_LOG_EVENT:
+            if (h->historyCount < MAX_HISTORY)
+            {
+                h->history[h->historyCount].time = h->elapsed;
+                strncpy(h->history[h->historyCount].text, ev->text, 79);
+                h->history[h->historyCount].color = ev->textColor;
+                h->historyCount++;
+            }
             break;
 
         default:
@@ -385,8 +415,8 @@ void Highlight_DrawHUD(const Highlight *h)
         snprintf(spd, sizeof(spd), "x%.2f  [Q/E]", h->speedMult);
         int spw = MeasureText(spd, 12);
         Color spdCol = (h->speedMult != 1.0f)
-                        ? (Color){255, 200, 0, 255}
-                        : (Color){120, 120, 120, 255};
+                           ? (Color){255, 200, 0, 255}
+                           : (Color){120, 120, 120, 255};
         DrawText(spd, SCREEN_W - spw - 8, 20, 12, spdCol);
 
         if (h->wireframe)
@@ -400,6 +430,46 @@ void Highlight_DrawHUD(const Highlight *h)
     DrawText(h->title, SCREEN_W / 2 - tw / 2, SCREEN_H - 28, 18, YELLOW);
     int sw2 = MeasureText(h->subtitle, 14);
     DrawText(h->subtitle, SCREEN_W / 2 - sw2 / 2, SCREEN_H - 14, 12, WHITE);
+
+    /* Panel history — muncul saat showHistory true */
+    if (h->showHistory && h->historyCount > 0)
+    {
+        /* Hitung berapa baris yang muat di atas bar kontrol (SCREEN_H-56)
+           dan di bawah bar atas HUD (y=46) */
+        int panX = SCREEN_W - 366;
+        int panY = 46;
+        int maxRows = (SCREEN_H - 56 - panY - 20) / 18;
+        int rows = h->historyCount < maxRows ? h->historyCount : maxRows;
+        int panH = rows * 18 + 20;
+
+        /* Background */
+        for (int row = panY; row < panY + panH; row++)
+            BresenhamLine(panX, row, panX + 360, row,
+                          (Color){8, 8, 8, 190});
+
+        /* Border atas */
+        BresenhamLine(panX, panY, panX + 360, panY,
+                      (Color){255, 210, 0, 160});
+
+        /* Judul */
+        DrawText("EVENT HISTORY  [H]",
+                 panX + 6, panY + 3, 11,
+                 (Color){255, 210, 0, 220});
+
+        /* Entri — tampilkan yang paling baru di bawah */
+        for (int i = 0; i < rows; i++)
+        {
+            /* Ambil dari belakang agar entri terbaru di bawah */
+            int idx = h->historyCount - rows + i;
+            char line[96];
+            snprintf(line, sizeof(line), "%5.1fs  %s",
+                     h->history[idx].time,
+                     h->history[idx].text);
+            int ey = panY + 18 + i * 18;
+            DrawText(line, panX + 7, ey + 1, 10, (Color){0, 0, 0, 120});
+            DrawText(line, panX + 6, ey, 10, h->history[idx].color);
+        }
+    }
 }
 
 TimelineEvent Evt_ScoreUpdate(float t, int s1, int s2, int minute)

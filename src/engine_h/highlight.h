@@ -10,6 +10,7 @@
    ================================================================ */
 
 #define MAX_EVENTS 2000
+#define MAX_HISTORY 64
 
 typedef enum
 {
@@ -31,6 +32,7 @@ typedef enum
     EVT_GOAL_FLASH,
     EVT_SCORE_UPDATE,
     EVT_WAIT,
+    EVT_LOG_EVENT
 } EventType;
 
 typedef struct
@@ -111,7 +113,15 @@ typedef struct
     Color team1Color;
     Color team2Color;
     bool  wireframe;   
-    float speedMult;   
+    float speedMult;
+
+    struct {
+        float time;
+        char  text[80];
+        Color color;
+    } history[MAX_HISTORY];
+    int  historyCount;
+    bool showHistory;
 } Highlight;
 
 /* ================================================================
@@ -196,6 +206,8 @@ void HL_Goal(Highlight *h, float t, int s1, int s2, int minute);
     Tunggu sampai waktu t (tidak ada aksi, hanya menandai akhir scene).
 */
 void HL_Wait(Highlight *h, float t);
+
+void HL_Log(Highlight *h, float t, const char *text, Color col);
 
 /* ================================================================
     ENGINE (dipanggil oleh main.c dan menu.c, bukan scene)

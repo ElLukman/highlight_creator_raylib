@@ -27,7 +27,7 @@ Highlight Scene_ARS_MUN_Build(void)
     Highlight h;
     Highlight_Init(&h,
         "Arsenal  vs  Man Utd",
-        "Liga Inggris  |  Full-time: 2-3",
+        "EPL  |  Full-time: 2-3",
         "Arsenal", "Man Utd", ARS, MU);
     h.minute = 20;
     h.score1 = 0;

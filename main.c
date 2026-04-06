@@ -15,7 +15,7 @@
 */
 typedef enum
 {
-    APP_LOADING,  /* layar loading pertama kali program dibuka */
+    APP_LOADING, /* layar loading pertama kali program dibuka */
     APP_MENU,
     APP_PLAY
 } AppState;
@@ -30,13 +30,13 @@ static void DrawMetrics(const Highlight *h)
     if (!showMetrics)
         return;
 
-    int fps     = GetFPS();
-    float ft    = GetFrameTime() * 1000.0f;  /* ms */
+    int fps = GetFPS();
+    float ft = GetFrameTime() * 1000.0f; /* ms */
 
     char buf[128];
-    int  y = 50, fs = 16, pad = 4;
-    int  bw = 220, bh = 110;
-    int  bx = SCREEN_W - bw - 10;
+    int y = 50, fs = 16, pad = 4;
+    int bw = 220, bh = 110;
+    int bx = SCREEN_W - bw - 10;
 
     // Background panel
     for (int row = y; row < y + bh; row++)
@@ -44,9 +44,10 @@ static void DrawMetrics(const Highlight *h)
     Bres_ThickLine(bx, y, bx + bw, y, 1, (Color){255, 210, 0, 255});
 
     // FPS
-    Color fpsCol = (fps >= 55) ? GREEN : (fps >= 30) ? YELLOW : RED;
+    Color fpsCol = (fps >= 55) ? GREEN : (fps >= 30) ? YELLOW
+                                                     : RED;
     snprintf(buf, sizeof(buf), "FPS:        %d", fps);
-    DrawText(buf, bx + pad, y + pad,      fs, fpsCol);
+    DrawText(buf, bx + pad, y + pad, fs, fpsCol);
 
     // Frame time
     snprintf(buf, sizeof(buf), "Frame:    %.2f ms", ft);
@@ -56,7 +57,7 @@ static void DrawMetrics(const Highlight *h)
     if (h)
     {
         snprintf(buf, sizeof(buf), "Event:    %d / %d",
-            h->nextEvent, h->eventCount);
+                 h->nextEvent, h->eventCount);
         DrawText(buf, bx + pad, y + pad + 40, fs, WHITE);
 
         snprintf(buf, sizeof(buf), "Players:  %d", h->playerCount);
@@ -67,7 +68,7 @@ static void DrawMetrics(const Highlight *h)
     }
 
     DrawText("[F3] tutup", bx + pad, y + bh - 16, 12,
-        (Color){120, 120, 120, 255});
+             (Color){120, 120, 120, 255});
 }
 
 /*
@@ -80,9 +81,9 @@ static void DrawLoadingScreen(int step, int total)
 {
     ClearBackground((Color){8, 4, 4, 255});
 
-    int  cx = SCREEN_W / 2, cy = SCREEN_H / 2;
-    int  bw = 500, bh = 24;
-    int  bx = cx - bw / 2, by = cy + 30;
+    int cx = SCREEN_W / 2, cy = SCREEN_H / 2;
+    int bw = 500, bh = 24;
+    int bx = cx - bw / 2, by = cy + 30;
 
     // Judul
     const char *title = "Football Highlight Creator";
@@ -96,11 +97,10 @@ static void DrawLoadingScreen(int step, int total)
     const char *statuses[] = {
         "Memuat tribun stadion...",
         "Merender lapangan...",
-        "Siap!"
-    };
+        "Siap!"};
     const char *status = (step < total) ? statuses[step] : statuses[2];
     DrawText(status, cx - MeasureText(status, 16) / 2, by - 24, 16,
-        (Color){180, 180, 180, 255});
+             (Color){180, 180, 180, 255});
 
     // Progress bar background
     for (int row = by; row < by + bh; row++)
@@ -114,14 +114,14 @@ static void DrawLoadingScreen(int step, int total)
     {
         for (int row = by + 2; row < by + bh - 2; row++)
             BresenhamLine(bx + 2, row, bx + 2 + fillW, row,
-                (Color){220, 30, 30, 255});
+                          (Color){220, 30, 30, 255});
     }
 
     // Persen
     char pct[16];
     snprintf(pct, sizeof(pct), "%d%%", (step * 100) / total);
     DrawText(pct, cx - MeasureText(pct, 16) / 2, by + bh + 8, 16,
-        (Color){200, 200, 200, 255});
+             (Color){200, 200, 200, 255});
 }
 
 /*
@@ -173,12 +173,14 @@ static void FillBar(int x, int y, int w, int h, Color col)
 
 static void DrawControls(void)
 {
-    FillBar(0, SCREEN_H - 24, SCREEN_W, 24, (Color){0, 0, 0, 200});
-    const char *hint = "[SPACE] Pause   [R] Ulang   [F3] Metrik   [Z] 18 Zona   [W] Wireframe   [Q/E] Speed   [H] History   [ESC] Menu";    DrawText(
-        hint,
-        SCREEN_W / 2 - MeasureText(hint, 12) / 2,
-        SCREEN_H - 18, 12,
-        (Color){130, 130, 130, 255});
+    FillBar(0, 38, SCREEN_W, 18, (Color){0, 0, 0, 200});
+    const char *hint =
+        "[SPACE] Pause   [R] Ulang   [F3] Metrik   [Z] 18 Zona"
+        "   [W] Wireframe   [Q/E] Speed   [H] History   [ESC] Menu";
+    DrawText(hint,
+             SCREEN_W / 2 - MeasureText(hint, 11) / 2,
+             42, 11,
+             (Color){130, 130, 130, 255});
 }
 
 static void DrawPauseOverlay(void)
@@ -187,7 +189,7 @@ static void DrawPauseOverlay(void)
         BresenhamLine(0, row, SCREEN_W - 1, row, (Color){0, 0, 0, 100});
 
     FillBar(SCREEN_W / 2 - 180, SCREEN_H / 2 - 44, 360, 88,
-        (Color){0, 0, 0, 230});
+            (Color){0, 0, 0, 230});
     Bres_ThickLine(
         SCREEN_W / 2 - 180, SCREEN_H / 2 - 44,
         SCREEN_W / 2 + 180, SCREEN_H / 2 - 44, 2, YELLOW);
@@ -197,18 +199,18 @@ static void DrawPauseOverlay(void)
 
     int pw = MeasureText("[ PAUSED ]", 32);
     DrawText("[ PAUSED ]",
-        SCREEN_W / 2 - pw / 2, SCREEN_H / 2 - 28, 32, YELLOW);
+             SCREEN_W / 2 - pw / 2, SCREEN_H / 2 - 28, 32, YELLOW);
 
     const char *hint = "[SPACE] Lanjutkan    [R] Ulang";
     DrawText(hint,
-        SCREEN_W / 2 - MeasureText(hint, 13) / 2,
-        SCREEN_H / 2 + 14, 13, WHITE);
+             SCREEN_W / 2 - MeasureText(hint, 13) / 2,
+             SCREEN_H / 2 + 14, 13, WHITE);
 }
 
 static void DrawFinishedOverlay(void)
 {
     FillBar(SCREEN_W / 2 - 240, SCREEN_H / 2 - 44, 480, 88,
-        (Color){0, 0, 0, 220});
+            (Color){0, 0, 0, 220});
     Bres_ThickLine(
         SCREEN_W / 2 - 240, SCREEN_H / 2 - 44,
         SCREEN_W / 2 + 240, SCREEN_H / 2 - 44, 2, YELLOW);
@@ -218,12 +220,12 @@ static void DrawFinishedOverlay(void)
 
     int bw = MeasureText("Highlight Selesai!", 26);
     DrawText("Highlight Selesai!",
-        SCREEN_W / 2 - bw / 2, SCREEN_H / 2 - 28, 26, YELLOW);
+             SCREEN_W / 2 - bw / 2, SCREEN_H / 2 - 28, 26, YELLOW);
 
     const char *hint = "[R] Ulang    [ESC] Menu";
     DrawText(hint,
-        SCREEN_W / 2 - MeasureText(hint, 14) / 2,
-        SCREEN_H / 2 + 12, 14, WHITE);
+             SCREEN_W / 2 - MeasureText(hint, 14) / 2,
+             SCREEN_H / 2 + 12, 14, WHITE);
 }
 
 /*
@@ -232,7 +234,7 @@ static void DrawFinishedOverlay(void)
 int main(void)
 {
     InitWindow(SCREEN_W, SCREEN_H,
-        "Football Highlight Creator - Arsenal vs Man Utd");
+               "Football Highlight Creator - Arsenal vs Man Utd");
     SetTargetFPS(60);
     SetExitKey(KEY_NULL);
 
@@ -243,11 +245,11 @@ int main(void)
 
     Audio_StartMenu();
 
-    AppState  state  = APP_LOADING;
-    state = APP_MENU;  /* langsung ke menu setelah preload selesai */
+    AppState state = APP_LOADING;
+    state = APP_MENU; /* langsung ke menu setelah preload selesai */
 
-    bool      paused = false;
-    Menu      menu;
+    bool paused = false;
+    Menu menu;
     Highlight hl;
 
     Menu_Init(&menu);
@@ -298,7 +300,7 @@ int main(void)
                 paused = false;
             }
             if (IsKeyPressed(KEY_Z))
-                g_fieldMode = (g_fieldMode == 0) ? 1 : 0;   
+                g_fieldMode = (g_fieldMode == 0) ? 1 : 0;
 
             /* [W] wireframe toggle */
             if (IsKeyPressed(KEY_W))
@@ -307,20 +309,29 @@ int main(void)
             /* [Q] lebih lambat, [E] lebih cepat */
             if (IsKeyPressed(KEY_Q))
             {
-                if      (hl.speedMult > 1.9f) hl.speedMult = 1.0f;
-                else if (hl.speedMult > 0.9f) hl.speedMult = 0.5f;
-                else if (hl.speedMult > 0.4f) hl.speedMult = 0.25f;
+                if (hl.speedMult > 1.9f)
+                    hl.speedMult = 1.0f;
+                else if (hl.speedMult > 0.9f)
+                    hl.speedMult = 0.5f;
+                else if (hl.speedMult > 0.4f)
+                    hl.speedMult = 0.25f;
             }
             if (IsKeyPressed(KEY_E))
             {
-                if      (hl.speedMult < 0.3f) hl.speedMult = 0.5f;
-                else if (hl.speedMult < 0.9f) hl.speedMult = 1.0f;
-                else if (hl.speedMult < 1.9f) hl.speedMult = 2.0f;
+                if (hl.speedMult < 0.3f)
+                    hl.speedMult = 0.5f;
+                else if (hl.speedMult < 0.9f)
+                    hl.speedMult = 1.0f;
+                else if (hl.speedMult < 1.9f)
+                    hl.speedMult = 2.0f;
             }
 
             // Toggle metrics overlay
             if (IsKeyPressed(KEY_F3))
                 showMetrics = !showMetrics;
+
+            if (IsKeyPressed(KEY_H))
+                hl.showHistory = !hl.showHistory;
         }
 
         // Update
