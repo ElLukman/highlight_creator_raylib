@@ -121,7 +121,6 @@ void Player_Update(Player *p, float dt)
     p->x = p->startX + (p->tx - p->startX) * et;
     p->y = p->startY + (p->ty - p->startY) * et;
 }
-
 void Player_Draw(const Player *p)
 {
     if (!p->active)
@@ -130,21 +129,51 @@ void Player_Draw(const Player *p)
     int cx = (int)p->x, cy = (int)p->y;
     Vector2 cpos = { (float)cx, (float)cy };
 
-    /* Shadow — satu GPU call */
+    // Shadow 
     DrawCircleV((Vector2){(float)(cx+2),(float)(cy+3)},
                 (float)PLAYER_RADIUS, (Color){0,0,0,60});
 
-    /* Body — satu GPU call */
+    // Body 
     DrawCircleV(cpos, (float)PLAYER_RADIUS, p->color);
 
-    /* Outline putih — satu GPU call */
-    DrawCircleLines(cx, cy, (float)PLAYER_RADIUS, WHITE);
+    // Outline putih tebal agar "pop" dari background hijau 
+    DrawCircleLines(cx, cy, (float)PLAYER_RADIUS,       WHITE);
+    DrawCircleLines(cx, cy, (float)(PLAYER_RADIUS + 1), (Color){0,0,0,80});
 
-    /* Nomor punggung */
+    // Nomor punggung 
     char buf[4];
     snprintf(buf, sizeof(buf), "%d", p->num);
     int tw = MeasureText(buf, 10);
     DrawText(buf, cx - tw / 2, cy - 5, 10, p->numColor);
+
+    // Hidung arah gerakan, hanya tampil saat pemain sedang berpindah 
+    float dx = p->tx - p->x;
+    float dy = p->ty - p->y;
+    float dist = sqrtf(dx * dx + dy * dy);
+    if (dist > 4.0f)
+    {
+        // normalisasi arah 
+        dx /= dist;
+        dy /= dist;
+
+        // ujung hidung: di luar lingkaran sejauh 7px 
+        float nx = p->x + dx * (PLAYER_RADIUS + 7);
+        float ny = p->y + dy * (PLAYER_RADIUS + 7);
+
+        // dua sayap segitiga: tegak lurus arah gerak, lebar 4px 
+        float px2 = -dy * 4.0f;
+        float py2 =  dx * 4.0f;
+
+        float w1x = p->x + dx * PLAYER_RADIUS + px2;
+        float w1y = p->y + dy * PLAYER_RADIUS + py2;
+        float w2x = p->x + dx * PLAYER_RADIUS - px2;
+        float w2y = p->y + dy * PLAYER_RADIUS - py2;
+
+        // gambar segitiga pakai DrawLineV (GPU, tidak perlu Bresenham) 
+        DrawLineV((Vector2){w1x, w1y}, (Vector2){(float)nx, (float)ny}, WHITE);
+        DrawLineV((Vector2){w2x, w2y}, (Vector2){(float)nx, (float)ny}, WHITE);
+        DrawLineV((Vector2){w1x, w1y}, (Vector2){w2x, w2y},             WHITE);
+    }
 }
 
 /*
