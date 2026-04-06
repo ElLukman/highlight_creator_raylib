@@ -4,6 +4,48 @@
 #include "src/algorithm_h/midcircle.h"
 #include <math.h>
 
+int g_fieldMode = 0;
+
+void Field_DrawZones(void)
+{
+    int cols = 6, rows = 3;
+    int cw   = FIELD_W / cols;
+    int rh   = FIELD_H / rows;
+
+    // garis kolom 
+    for (int c = 1; c < cols; c++)
+    {
+        int x = FIELD_X + c * cw;
+        // kolom 1 dan 5 = batas kotak penalti → sedikit lebih terang 
+        Color col = (c == 1 || c == 5)
+                    ? (Color){255, 255, 255, 60}
+                    : (Color){255, 255, 255, 28};
+        Bres_ThickLine(x, FIELD_Y, x, FIELD_Y + FIELD_H, 1, col);
+    }
+
+    // garis baris 
+    for (int r = 1; r < rows; r++)
+    {
+        int y = FIELD_Y + r * rh;
+        Bres_ThickLine(FIELD_X, y, FIELD_X + FIELD_W, y, 1,
+                       (Color){255, 255, 255, 28});
+    }
+
+    // label zona A1–F3 di pojok kiri atas setiap sel 
+    for (int r = 0; r < rows; r++)
+    {
+        for (int c = 0; c < cols; c++)
+        {
+            char lbl[3] = { 'A' + c, '1' + r, '\0' };
+            int lx = FIELD_X + c * cw + 4;
+            int ly = FIELD_Y + r * rh + 4;
+            DrawText(lbl, lx + 1, ly + 1, 10, (Color){0,   0,   0,   90});
+            DrawText(lbl, lx,     ly,     10, (Color){255, 255, 255, 65});
+        }
+    }
+}
+
+
 /*
     Render Cache
 */
@@ -258,6 +300,8 @@ void Field_Draw(void)
         fieldCache.texture,
         (Rectangle){0, 0, (float)SCREEN_W, (float)-SCREEN_H},
         (Vector2){0, 0}, WHITE);
+
+    if (g_fieldMode == 1) Field_DrawZones();
 }
 
 void Field_DrawGoals(void)

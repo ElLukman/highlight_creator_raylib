@@ -23,8 +23,14 @@
 #define c_floodlit  (Color){ 255, 245, 185, 255 }
 #define c_sky       (Color){ 32, 38, 50, 255 }
 
+
 // Function atau API 
 void Field_Draw(void);
+void Field_DrawZones(void);
+
+// Mode Lapangan
+extern int g_fieldMode;
+
 void Field_DrawGoals(void);
 void Field_DrawStadium(void);
 

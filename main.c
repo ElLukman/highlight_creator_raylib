@@ -174,7 +174,7 @@ static void FillBar(int x, int y, int w, int h, Color col)
 static void DrawControls(void)
 {
     FillBar(0, SCREEN_H - 24, SCREEN_W, 24, (Color){0, 0, 0, 200});
-    const char *hint = "[SPACE] Pause   [R] Ulang   [F3] Metrik   [ESC] Menu";
+    const char *hint = "[SPACE] Pause   [R] Ulang   [F3] Metrik   [Z] Bagi Lapangan jadi 18 Zona    [ESC] Menu";
     DrawText(
         hint,
         SCREEN_W / 2 - MeasureText(hint, 12) / 2,
@@ -298,7 +298,10 @@ int main(void)
                 hl = Scene_ARS_MUN_Build();
                 paused = false;
             }
-            // Toggle metrics overlay
+            if (IsKeyPressed(KEY_Z))
+                g_fieldMode = (g_fieldMode == 0) ? 1 : 0;   
+
+                // Toggle metrics overlay
             if (IsKeyPressed(KEY_F3))
                 showMetrics = !showMetrics;
         }
