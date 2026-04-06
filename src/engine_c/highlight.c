@@ -330,6 +330,13 @@ void Highlight_Draw(const Highlight *h)
     shakenBall.y += oy;
     Ball_Draw(&shakenBall);
 
+    {
+        int bx = (int)shakenBall.x;
+        int by = (int)shakenBall.y;
+        Midcircle(bx, by, 11, (Color){255, 255, 255, 50});
+        Midcircle(bx, by,  9, (Color){255, 255, 180, 80});
+    }
+
     /* Overlay teks (tidak ikut shake agar tetap terbaca) */
     for (int i = 0; i < MAX_OVERLAY_TEXTS; i++)
     {

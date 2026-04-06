@@ -206,14 +206,23 @@ void Ball_Update(Ball *b, float dt)
     }
 }
 
+// SESUDAH:
 void Ball_Draw(const Ball *b)
 {
     int bx = (int)b->x, by = (int)b->y;
-    Vector2 bpos = { (float)bx, (float)by };
-    /* Shadow */
-    DrawCircleV((Vector2){(float)(bx+1),(float)(by+1)}, 6.0f, (Color){0,0,0,60});
-    /* Body putih */
-    DrawCircleV(bpos, 6.0f, (Color){255,255,255,255});
-    /* Outline hitam */
-    DrawCircleLines(bx, by, 6.0f, (Color){0,0,0,200});
+
+    // Shadow
+    MidcircleFilled(bx + 4, by + 2, 7, (Color){0, 0, 0, 60});
+
+    // Glow luar 
+    MidcircleFilled(bx, by, 12, (Color){255, 255, 200, 40});
+
+    // Badan bola
+    MidcircleFilled(bx, by, 6, (Color){255, 255, 255, 255});
+
+    // Outline hitam kontras
+    Midcircle(bx, by, 8, (Color){0, 0, 0, 220});
+
+    // Outline putih tipis di luar hitam (double-ring)
+    Midcircle(bx, by, 10, (Color){255, 255, 255, 100});
 }
