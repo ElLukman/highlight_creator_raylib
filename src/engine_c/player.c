@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdio.h>
 
+int g_wireframe = 0;
+
 /*
     Easing Functions
     Semua menerima t dalam [0,1] dan mengembalikan nilai [0,1].
@@ -133,12 +135,19 @@ void Player_Draw(const Player *p)
     DrawCircleV((Vector2){(float)(cx+2),(float)(cy+3)},
                 (float)PLAYER_RADIUS, (Color){0,0,0,60});
 
-    // Body 
-    DrawCircleV(cpos, (float)PLAYER_RADIUS, p->color);
-
-    // Outline putih tebal agar "pop" dari background hijau 
-    DrawCircleLines(cx, cy, (float)PLAYER_RADIUS,       WHITE);
-    DrawCircleLines(cx, cy, (float)(PLAYER_RADIUS + 1), (Color){0,0,0,80});
+    if (g_wireframe)
+    {
+        /* Wireframe: hanya ring warna tim, tanpa isi */
+        DrawCircleLines(cx, cy, (float)PLAYER_RADIUS,       p->color);
+        DrawCircleLines(cx, cy, (float)(PLAYER_RADIUS + 1), WHITE);
+    }
+    else
+    {
+        /* Normal */
+        DrawCircleV(cpos, (float)PLAYER_RADIUS, p->color);
+        DrawCircleLines(cx, cy, (float)PLAYER_RADIUS,       WHITE);
+        DrawCircleLines(cx, cy, (float)(PLAYER_RADIUS + 1), (Color){0,0,0,80});
+    }
 
     // Nomor punggung 
     char buf[4];

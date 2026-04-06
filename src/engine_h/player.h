@@ -7,6 +7,8 @@
 #define MAX_PLAYERS   22
 #define PLAYER_RADIUS 14
 
+extern int g_wireframe;
+
 /*
     MoveType
     Tipe animasi gerakan, berlaku untuk pemain maupun bola.

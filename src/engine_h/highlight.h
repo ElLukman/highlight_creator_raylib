@@ -110,6 +110,8 @@ typedef struct
     int   minute;
     Color team1Color;
     Color team2Color;
+    bool  wireframe;   
+    float speedMult;   
 } Highlight;
 
 /* ================================================================

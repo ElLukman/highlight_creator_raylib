@@ -123,8 +123,8 @@ static void DrawStand(void)
     // Teks MANCHESTER di Kursi
     int textBandY = baseY + (int)(standH * 0.5f);
     FillRect((int)(SCREEN_W * 0.08f), textBandY, (int)(SCREEN_W * 0.84f), (int)(standH * 0.1f), C_SEAT_WHITE);
-    int mw = MeasureText("MANCHESTER", 28);
-    DrawText("MANCHESTER", SCREEN_W / 2 - mw / 2, textBandY + (int)(standH * 0.02f), 28, C_SEAT_RED);
+    int mw = MeasureText("MANCHESTER UNITED", 28);
+    DrawText("MANCHESTER UNITED", SCREEN_W / 2 - mw / 2, textBandY + (int)(standH * 0.02f), 28, C_SEAT_RED);
 
     // Kursi Bagian Bawah
     int seatLowerY = baseY + (int)(standH * 0.6f);

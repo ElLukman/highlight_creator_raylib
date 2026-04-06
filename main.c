@@ -174,8 +174,7 @@ static void FillBar(int x, int y, int w, int h, Color col)
 static void DrawControls(void)
 {
     FillBar(0, SCREEN_H - 24, SCREEN_W, 24, (Color){0, 0, 0, 200});
-    const char *hint = "[SPACE] Pause   [R] Ulang   [F3] Metrik   [Z] Bagi Lapangan jadi 18 Zona    [ESC] Menu";
-    DrawText(
+    const char *hint = "[SPACE] Pause   [R] Ulang   [F3] Metrik   [Z] 18 Zona   [W] Wireframe   [Q/E] Speed   [H] History   [ESC] Menu";    DrawText(
         hint,
         SCREEN_W / 2 - MeasureText(hint, 12) / 2,
         SCREEN_H - 18, 12,
@@ -301,7 +300,25 @@ int main(void)
             if (IsKeyPressed(KEY_Z))
                 g_fieldMode = (g_fieldMode == 0) ? 1 : 0;   
 
-                // Toggle metrics overlay
+            /* [W] wireframe toggle */
+            if (IsKeyPressed(KEY_W))
+                hl.wireframe = !hl.wireframe;
+
+            /* [Q] lebih lambat, [E] lebih cepat */
+            if (IsKeyPressed(KEY_Q))
+            {
+                if      (hl.speedMult > 1.9f) hl.speedMult = 1.0f;
+                else if (hl.speedMult > 0.9f) hl.speedMult = 0.5f;
+                else if (hl.speedMult > 0.4f) hl.speedMult = 0.25f;
+            }
+            if (IsKeyPressed(KEY_E))
+            {
+                if      (hl.speedMult < 0.3f) hl.speedMult = 0.5f;
+                else if (hl.speedMult < 0.9f) hl.speedMult = 1.0f;
+                else if (hl.speedMult < 1.9f) hl.speedMult = 2.0f;
+            }
+
+            // Toggle metrics overlay
             if (IsKeyPressed(KEY_F3))
                 showMetrics = !showMetrics;
         }
