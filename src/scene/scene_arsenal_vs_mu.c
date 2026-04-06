@@ -65,6 +65,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_BallAt(&h, t, 1074, 183);
     t += 0.3f;
 
+    // Komentator
+    HL_Text(&h, t, "Hincape membawa bola", 28, WHITE);
+
     /* Aksi 1->2 (3s) */
     HL_Move(&h, t,  0, P_CONT(g1[ 0],  262,  532, 2.0f, LINEAR));
     HL_Move(&h, t,  1, P_CONT(g1[ 1], 1339,  256, 2.0f, LINEAR));
@@ -90,6 +93,9 @@ Highlight Scene_ARS_MUN_Build(void)
     g1[0].ex=262;g1[0].ey=532;
     HL_Ball(&h, t, B(1074, 183, 1387, 268, 2.0f, LINEAR));
     t += 2.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Hincape mengumpan ke kotak!", 28, WHITE);
 
     /* Aksi 2->3 (2s) */
     HL_Move(&h, t,  0, P_CONT(g1[ 0],  294,  535, 2.0f, LINEAR));
@@ -117,6 +123,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1387, 268, 1685, 648, 2.0f, LINEAR));
     t += 2.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Dihalau oleh Dorgu!", 28, WHITE);
+
     /* Aksi 3->4 (2s) */
     HL_Move(&h, t,  1, P_CONT(g1[ 1], 1631,  384, 1.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g1[ 2], 1195,  455, 1.0f, LINEAR));
@@ -136,6 +145,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 20, P_CONT(g1[20], 1504,  378, 1.0f, LINEAR));
     HL_Ball(&h, t, B(1685, 648, 1639, 697, 1.0f, LINEAR));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Bola memantul ke Saka dan dibawa ke dalam kotak", 28, WHITE);
 
     /* Aksi 4->5 (1s) */
     HL_Move(&h, t,  0, P_CONT(g1[ 0],  323,  527, 1.0f, LINEAR));
@@ -162,6 +174,10 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1639, 697, 1737, 713, 1.0f, LINEAR));
     t += 1.0f;
 
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Cutback ke Odegaard", 28, WHITE);
+
     /* Aksi 5->6 (1s) - bezier */
     HL_Move(&h, t,  0, P_CONT(g1[ 0],  346,  545, 1.0f, LINEAR));
     HL_Move(&h, t,  1, P_CONT(g1[ 1], 1656,  410, 1.0f, LINEAR));
@@ -185,6 +201,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g1[21], 1758,  656, 1.0f, LINEAR));
     HL_Ball(&h, t, B_BEZ(1737, 713, 1615, 656, 1676, 570, 1.0f));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Odegaard tembak!", 28, WHITE);
 
     /* Aksi 6->7 (1s) */
     HL_Move(&h, t,  0, P_CONT(g1[ 0],  360,  550, 0.5f, LINEAR));
@@ -212,12 +231,16 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1615, 656, 1733, 573, 0.5f, LINEAR));
     t += 0.5f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Mantul ke Martinez!", 28, WHITE);
+
     /* Aksi 7->8 (bola masuk) */
     HL_Move(&h, t, 11, P_CONT(g1[11], 1801, 553, 0.5f, LINEAR));
     HL_Ball(&h, t, B(1733, 573, 1820, 563, 0.5f, LINEAR));
     t += 0.5f;
 
     /* ===== GOL 1 - Aksi 7 ===== */
+    HL_Hide(&h, t);
     HL_Goal(&h, t, 1, 0, 29);
     HL_Text(&h, t, "GOOOL!! 1-0  |  29'  OG Martinez", 28, GOLD);
 
@@ -279,6 +302,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_BallAt(&h, t, 581, 647);
     t += 0.3f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Zubimendi oper ke belakang", 28, WHITE);
+
     /* Aksi 1->2 (1s) */
     HL_Move(&h, t,  1, P_CONT(g2[ 1], 1004,  155, 1.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g2[ 2],  584,  295, 1.0f, LINEAR));
@@ -303,6 +329,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(581, 647, 517, 580, 1.0f, LINEAR));
     t += 1.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Saliba oper kembali ke Zubimendi", 28, WHITE);
+
     /* Aksi 2->3 (2s) */
     HL_Move(&h, t,  1, P_CONT(g2[ 1],  987,  158, 2.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g2[ 2],  590,  313, 2.0f, LINEAR));
@@ -325,6 +354,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g2[21],  828,  764, 2.0f, LINEAR));
     HL_Ball(&h, t, B(517, 580, 508, 715, 2.0f, LINEAR));
     t += 2.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Zubimendi salah oper!!!", 28, WHITE);
 
     /* Aksi 3->4 (2s) */
     HL_Move(&h, t,  0, P_CONT(g2[ 0],  274,  506, 2.0f, LINEAR));
@@ -351,6 +383,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(508, 715, 412, 497, 2.0f, LINEAR));
     t += 2.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Mbeumo mengambil bola!", 28, WHITE);
+
     /* Aksi 4->5 (1s) */
     HL_Move(&h, t,  0, P_CONT(g2[ 0],  315,  493, 1.0f, LINEAR));
     HL_Move(&h, t,  1, P_CONT(g2[ 1],  923,  174, 1.0f, LINEAR));
@@ -375,6 +410,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g2[21],  738,  779, 1.0f, LINEAR));
     HL_Ball(&h, t, B(412, 497, 371, 469, 1.0f, LINEAR));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Mbeumo SHOOT!!!", 28, WHITE);
 
     /* Aksi 5->6 (2s) - Mbeumo tembak */
     HL_Move(&h, t,  0, P_CONT(g2[ 0],  329,  503, 2.0f, LINEAR));
@@ -402,6 +440,7 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 2.0f;
 
     /* ===== GOL 2 - di bawah Aksi 5->6 ===== */
+    HL_Hide(&h, t);
     HL_Goal(&h, t, 1, 1, 37);
     HL_Text(&h, t, "GOOOL!! 1-1  |  37'  Mbeumo", 28, WHITE);
 
@@ -463,6 +502,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_BallAt(&h, t, 1038, 317);
     t += 0.3f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Martinez mengoper ke depan", 28, WHITE);
+
     /* Aksi 1->2 (1s) */
     HL_Move(&h, t,  1, P_CONT(g3[ 1], 1520,  742, 1.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g3[ 2], 1500,  566, 1.0f, LINEAR));
@@ -485,6 +527,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g3[21], 1328,  316, 1.0f, LINEAR));
     HL_Ball(&h, t, B(1038, 317, 1327, 351, 1.0f, LINEAR));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Diambil Dorgu", 28, WHITE);
 
     /* Aksi 2->3 (1s) */
     HL_Move(&h, t,  0, P_CONT(g3[ 0], 1783,  535, 1.0f, LINEAR));
@@ -511,6 +556,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1327, 351, 1293, 410, 1.0f, LINEAR));
     t += 1.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Oper ke Bruno Fernandes", 28, WHITE);
+
     /* Aksi 3->4 (1s) */
     HL_Move(&h, t,  1, P_CONT(g3[ 1], 1485,  723, 1.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g3[ 2], 1477,  527, 1.0f, LINEAR));
@@ -533,6 +581,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1293, 410, 1351, 433, 1.0f, LINEAR));
     t += 1.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Oper kembali ke Dorgu", 28, WHITE);
+
     /* Aksi 4->5 */
     HL_Move(&h, t,  1, P_CONT(g3[ 1], 1485,  731, 1.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g3[ 2], 1492,  511, 1.0f, LINEAR));
@@ -550,6 +601,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 20, P_CONT(g3[20], 1483,  615, 1.0f, LINEAR));
     HL_Ball(&h, t, B(1351, 433, 1264, 427, 1.0f, LINEAR));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Ohh Tiki-taka sangat baik dilakukan", 28, WHITE);
 
     /* Aksi 5->6 */
     HL_Move(&h, t,  1, P_CONT(g3[ 1], 1499,  728, 1.0f, LINEAR));
@@ -572,6 +626,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g3[21], 1343,  546, 1.0f, LINEAR));
     HL_Ball(&h, t, B(1264, 427, 1360, 442, 1.0f, LINEAR));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Diambil kembali oleh Dorgu", 28, WHITE);
 
     /* Aksi 6->7 */
     HL_Move(&h, t,  0, P_CONT(g3[ 0], 1786,  519, 1.0f, LINEAR));
@@ -597,6 +654,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1360, 442, 1389, 530, 1.0f, LINEAR));
     t += 1.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Dorgu, Dorgu, Dorgu", 28, WHITE);
+
     /* Aksi 7->8 (2s) */
     HL_Move(&h, t,  1, P_CONT(g3[ 1], 1550,  648, 2.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g3[ 2], 1509,  550, 2.0f, LINEAR));
@@ -619,6 +679,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g3[21], 1459,  539, 2.0f, LINEAR));
     HL_Ball(&h, t, B(1389, 530, 1482, 541, 2.0f, LINEAR));
     t += 2.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Dorgu TEMBAKKK!!!", 28, WHITE);
 
     /* Aksi 8->9 (1s) - Dorgu tembak */
     HL_Move(&h, t,  1, P_CONT(g3[ 1], 1666,  594, 1.0f, LINEAR));
@@ -644,6 +707,7 @@ Highlight Scene_ARS_MUN_Build(void)
     t += 1.0f;
 
     /* ===== GOL 3 - di bawah Aksi 8->9 ===== */
+    HL_Hide(&h, t);
     HL_Goal(&h, t, 1, 2, 50);
     HL_Text(&h, t, "GOOOL!! 1-2  |  50'  Patrick Dorgu", 28, WHITE);
 
@@ -707,6 +771,9 @@ Highlight Scene_ARS_MUN_Build(void)
     SpawnAll(&h, t, g4b, 22);
     HL_BallAt(&h, t, 113, 89);
     t += 0.3f;
+    
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Corner diambil oleh Saka", 28, WHITE);
 
     /* Aksi 1->2 (2s) */
     HL_Move(&h, t,  1, P_CONT(g4b[ 1],  168,  591, 2.0f, LINEAR));
@@ -732,6 +799,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(113, 89, 229, 438, 2.0f, LINEAR));
     t += 2.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Merino heading!", 28, WHITE);
+
     /* Aksi 2->3 (1s) */
     HL_Move(&h, t,  0, P_CONT(g4b[ 0], 1675,  530, 1.0f, LINEAR));
     HL_Move(&h, t,  1, P_CONT(g4b[ 1],  178,  543, 1.0f, LINEAR));
@@ -754,6 +824,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(229, 438, 129, 539, 1.0f, LINEAR));
     t += 1.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Dihalau Cunha!", 28, WHITE);
+
     /* Aksi 3->4 (1s) */
     HL_Move(&h, t,  1, P_CONT(g4b[ 1],  171,  559, 1.0f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g4b[ 2],  170,  481, 1.0f, LINEAR));
@@ -772,6 +845,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g4b[21],  100,  582, 1.0f, LINEAR));
     HL_Ball(&h, t, B(129, 539, 182, 506, 1.0f, LINEAR));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Merino Tembak kembali!", 28, WHITE);
 
     /* Aksi 4->5 (0.8s) */
     HL_Move(&h, t,  0, P_CONT(g4b[ 0], 1619,  522, 0.8f, LINEAR));
@@ -792,6 +868,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 19, P_CONT(g4b[19],  288,  534, 0.8f, LINEAR));
     HL_Ball(&h, t, B(182, 506, 104, 584, 0.8f, LINEAR));
     t += 0.8f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Ohh, dihalau Sesko!", 28, WHITE);
 
     /* Aksi 5->6 (1s) */
     HL_Move(&h, t,  2, P_CONT(g4b[ 2],  163,  466, 1.0f, LINEAR));
@@ -815,6 +894,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 20, P_CONT(g4b[20],  250,  547, 1.0f, LINEAR));
     HL_Ball(&h, t, B(104, 584, 362, 465, 1.0f, LINEAR));
     t += 1.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Bola memantul kepada Madueke", 28, WHITE);
 
     /* Aksi 6->7 (0.8s) - Merino tembak */
     HL_Move(&h, t,  0, P_CONT(g4b[ 0], 1613,  509, 0.8f, LINEAR));
@@ -844,7 +926,8 @@ Highlight Scene_ARS_MUN_Build(void)
 
     /* ===== GOL 4 - di bawah Aksi 6->7 ===== */
     HL_Goal(&h, t, 2, 2, 84);
-    HL_Text(&h, t, "GOOOL!! 2-2  |  84'  Mikel Merino", 28, GOLD);
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "OHHH GOLLL PEMIRSA 2-2  |  84'  Mikel Merino", 28, GOLD);
 
     /* Aksi 7->8 (0.7s) */
     HL_Move(&h, t,  1, P_CONT(g4b[ 1],  166,  626, 0.7f, LINEAR));
@@ -930,6 +1013,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_BallAt(&h, t, 1141, 318);
     t += 0.3f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Bruno Fernandes", 28, WHITE);
+
     /* Aksi 1->2 (1s) */
     HL_Move(&h, t,  0, P_CONT(g5[ 0], 1808,  521, 1.0f, LINEAR));
     HL_Move(&h, t,  1, P_CONT(g5[ 1], 1396,  297, 1.0f, LINEAR));
@@ -954,6 +1040,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1141, 318, 1180, 317, 1.0f, LINEAR));
     t += 1.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Bruno Fernandes umpan ke Mainoo", 28, WHITE);
+
     /* Aksi 2->3 (0.5s) */
     HL_Move(&h, t,  1, P_CONT(g5[ 1], 1396,  304, 0.5f, LINEAR));
     HL_Move(&h, t,  2, P_CONT(g5[ 2], 1477,  551, 0.5f, LINEAR));
@@ -977,6 +1066,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g5[21], 1347,  509, 0.5f, LINEAR));
     HL_Ball(&h, t, B(1180, 317, 1195, 384, 0.5f, LINEAR));
     t += 0.5f;
+    
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Mainoo umpan ke Cunha", 28, WHITE);
 
     /* Aksi 3->4 (1s) */
     HL_Move(&h, t,  0, P_CONT(g5[ 0], 1779,  512, 1.0f, LINEAR));
@@ -1002,6 +1094,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Ball(&h, t, B(1195, 384, 1314, 389, 1.0f, LINEAR));
     t += 1.0f;
 
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Cunha menggiring bola", 28, WHITE);
+
     /* Aksi 4->5 (1s) */
     HL_Move(&h, t,  0, P_CONT(g5[ 0], 1762,  512, 1.0f, LINEAR));
     HL_Move(&h, t,  1, P_CONT(g5[ 1], 1437,  305, 1.0f, LINEAR));
@@ -1026,6 +1121,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g5[21], 1437,  461, 1.0f, LINEAR));
     HL_Ball(&h, t, B(1314, 389, 1292, 459, 1.0f, LINEAR));
     t += 1.0f;
+    
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Masih Cunha", 28, WHITE);
 
     /* Aksi 5->6 (2s) */
     HL_Move(&h, t,  0, P_CONT(g5[ 0], 1765,  497, 2.0f, LINEAR));
@@ -1051,6 +1149,9 @@ Highlight Scene_ARS_MUN_Build(void)
     HL_Move(&h, t, 21, P_CONT(g5[21], 1599,  452, 2.0f, LINEAR));
     HL_Ball(&h, t, B(1292, 459, 1398, 500, 2.0f, LINEAR));
     t += 2.0f;
+
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "Cunha SHOOT!!!", 28, WHITE);
 
     /* Aksi 6->7 (0.8s) - Cunha tembak */
     HL_Move(&h, t,  0, P_CONT(g5[ 0], 1784,  523, 0.8f, LINEAR));
@@ -1078,7 +1179,8 @@ Highlight Scene_ARS_MUN_Build(void)
 
     /* ===== GOL 5 - di bawah Aksi 6->7 ===== */
     HL_Goal(&h, t, 2, 3, 87);
-    HL_Text(&h, t, "GOOOOL!!  CUNHA 2-3!!  MAN UTD MENANG!! 87'", 30, WHITE);
+    HL_Hide(&h, t);
+    HL_Text(&h, t, "GOLLL SPEKTAKULER!!! CUNHA 2-3!! 87'", 30, WHITE);
 
     /* Aksi 7->8 selebrasi MU (8s) */
     HL_Move(&h, t,  0, P_CONT(g5[ 0], 1819,  549, 8.0f, LINEAR));

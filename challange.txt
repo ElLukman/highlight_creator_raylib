@@ -1,0 +1,13 @@
+Lukman Ahmad Saat ini pemain hanya berbentuk lingkaran statis. Menambahkan "hidung" kecil atau panah pada lingkaran akan sangat membantu untuk mengetahui ke mana pemain sedang menghadap atau berlari.
+
+Pastikan bola (titik putih) selalu berada di lapisan paling atas. Saat ini bola terlihat agak "tenggelam" di antara kerumunan pemain di sisi kanan. 
+
+Memberikan glow tipis atau bayangan pada bola bisa membuatnya lebih menonjol, Lingkaran hitam dan merah sudah oke, tapi penambahan outline dengan warna kontras (misal: hitam dengan outline putih) akan membantu pemain lebih "pop" keluar dari background hijau lapangan 
+
+Menambahkan garis vertikal atau horizontal tipis yang membagi lapangan menjadi 18 zona (taktik klasik) dapat membantu pengguna menganalisis posisi pemain dengan lebih presisi,
+
+Di pojok kanan atas terdapat info Event: 758/904. Jika memungkinkan, tampilkan deskripsi singkat event tersebut di bawahnya, "Pass: Odegaard to Saka" atau "Ball Recovery". 
+
+Tampilkan History Event
+
+Buat Mode Wireframe dan pengatur kecepatan.
